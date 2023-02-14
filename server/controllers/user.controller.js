@@ -3,6 +3,10 @@ import extend from 'lodash/extend'
 import errorHandler from './../helpers/dbErrorHandler'
 
 const create = async (req, res) => {
+  const userExist = User.findOne(req.body);
+  if(userExist){
+    return res.status(204).json("User already existed");
+  }
   const user = new User(req.body)
   try {
     await user.save()
@@ -23,13 +27,13 @@ const userByID = async (req, res, next, id) => {
   try {
     let user = await User.findById(id)
     if (!user)
-      return res.status('400').json({
+      return res.status(400).json({
         error: "User not found"
       })
     req.profile = user
     next()
   } catch (err) {
-    return res.status('400').json({
+    return res.status(400).json({
       error: "Could not retrieve user"
     })
   }
